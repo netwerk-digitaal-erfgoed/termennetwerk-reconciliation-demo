@@ -33,11 +33,11 @@ class TermenNetwerkService extends ReconciliationService
 	//----------------------------------------------------------------------------------------------
 	// Handle an individual query
 	function OneQuery($query_key, $text, $limit = 1, $properties = null) {	
-		$dataset='erfgeo';
-		$url = 'http://demo.netwerkdigitaalerfgoed.nl:8080/nde/graphql?query=';
-		$url.= rawurlencode('{terms(match:"'.$text.'" dataset:["'.$dataset.'"]){dataset terms {uri prefLabel}}}');
 
-		$limit = 5;
+		$url = 'http://demo.netwerkdigitaalerfgoed.nl:8080/nde/graphql?query=';
+		$url.= rawurlencode('{terms(match:"'.$text.'" dataset:["'.$this->service.'"]){dataset terms {uri prefLabel}}}');
+
+		$limit = 10;
 	
 		$json = get($url);	
 		$obj = json_decode($json);
@@ -47,7 +47,7 @@ class TermenNetwerkService extends ReconciliationService
 		foreach ($obj->data->terms[0]->terms as $terms) {
 			if ($result_count>0) {			
 				$hit = new stdclass;
-				$hit->match = ($terms->name_strings_total == 1);
+				$hit->match = true; # ($terms->name_strings_total == 1);
 				$hit->name 	= $terms->prefLabel[0];
 				$hit->id 	= $terms->uri;
 				similar_text($text, $hit->name, $hit->score);
